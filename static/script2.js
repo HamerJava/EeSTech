@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    // Retrieve the issue ID dynamically from the data attribute or other source
+    // Retrieve the issue ID dynamically from the data attribute
     const issueContainer = document.querySelector(".issue-container");
     const issueId = issueContainer.dataset.issueId;
 
@@ -7,6 +7,7 @@ $(document).ready(function () {
     const websocket = new WebSocket(`ws://localhost:8000/ws/${issueId}`);
     let message_finished = true;
     let ongoingBotMessageId = null;
+    let suggestedReplyInProgress = false;
 
     // WebSocket connection established
     websocket.onopen = function (event) {
@@ -53,9 +54,26 @@ $(document).ready(function () {
         websocket.send(prompt_term); // Send user message via WebSocket
     });
 
+    // Handle "Suggested Reply" button click
+    $("#suggested-reply-btn").click(function () {
+        // Send a signal to request a suggested reply
+        suggestedReplyInProgress = true;
+        $("#suggested-reply-content").html("<span class='label'></span> ");
+        websocket.send("suggested_reply");
+    });
+
     // WebSocket message handling (responses from the server)
     websocket.onmessage = function (event) {
-        if (event.data === "__message_finished__") {
+        if (event.data.startsWith("suggested_reply:")) {
+            const replyContent = event.data.replace("suggested_reply:", "");
+
+            if (replyContent === "__message_finished__") {
+                suggestedReplyInProgress = false;
+            } else {
+                // Append each chunk to the suggested reply container
+                $("#suggested-reply-content").append(replyContent);
+            }
+        } else if (event.data === "__message_finished__") {
             // Mark the end of a bot response
             message_finished = true;
         } else {
@@ -68,4 +86,14 @@ $(document).ready(function () {
         const chatContainer = document.getElementById('chat-container');
         chatContainer.scrollTop = chatContainer.scrollHeight;
     };
+
+    // Handle "Copy" button click
+    $("#copy-reply-btn").click(function () {
+        const suggestedReply = $("#suggested-reply-content").text();
+        navigator.clipboard.writeText(suggestedReply).then(() => {
+            alert("Suggested reply copied to clipboard!");
+        }).catch((err) => {
+            console.error("Error copying to clipboard:", err);
+        });
+    });
 });

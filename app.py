@@ -79,7 +79,7 @@ async def issue_detail(request: Request, issue_id: str):
 async def websocket_endpoint(websocket: WebSocket, issue_id: str):
     await websocket.accept()
     try:
-        # Retrieve issue details for the given issue_id
+        # Retrieve issue details using the provided issue_id
         with connect_to_weaviate() as client:
             github_issues = client.collections.get("GithubIssues")
             response = github_issues.query.bm25(
@@ -93,24 +93,34 @@ async def websocket_endpoint(websocket: WebSocket, issue_id: str):
                 await websocket.close()
                 return
             issue_details = response.objects[0].properties
-        
+
         # Start conversation with the issue context
-        issue_context_message = (
-            f"You are discussing an issue with the following details: {issue_details}"
-        )
+        issue_context_message = f"You are discussing an issue with the following details: {issue_details}"
         await websocket.send_text(issue_context_message)
 
-        # Pass issue context into the chatbot
+        # Initialize conversation
         conversation = [{"role": "system", "content": issue_context_message}]
-        
-        # Receive user messages and send responses from the chatbot
+
+        # WebSocket message handling
         while True:
             data = await websocket.receive_text()
-            async for result in get_results(data, conversation):
-                await websocket.send_text(result)
-                await asyncio.sleep(0)
+            if data == "suggested_reply":
+                # Add a special prompt for generating a solution
+                conversation.append({"role": "user", "content": "Write a suggested reply to solve the issue. Start directly with the reply!"})
+
+                # Stream the suggested reply incrementally
+                async for result in get_results("Provide a suggested solution to fix the issue.", conversation):
+                    await websocket.send_text(f"suggested_reply:{result}")
+                    await asyncio.sleep(0)
+                await websocket.send_text("suggested_reply:__message_finished__")
+            else:
+                # Handle regular user input
+                async for result in get_results(data, conversation):
+                    await websocket.send_text(result)
+                    await asyncio.sleep(0)
     finally:
         await websocket.close()
+
 
 
 @app.get("/chat-history/{chat_id}")
