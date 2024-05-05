@@ -30,6 +30,36 @@ def format_output(objects):
     data = [{"properties": o.properties, "vector": o.vector} for o in objects]
     return data
 
+def migrate_issue_to_solved(issue_id: str):
+    """Migrate a specific issue to the Solved collection."""
+    with connect_to_weaviate() as client:
+        github_issues = client.collections.get("GithubIssues")
+        solved = client.collections.get("Solved")
+
+        # Retrieve the specific issue by ID
+        response = github_issues.query.bm25(
+            query=issue_id,
+            query_properties=["issue_id"],
+            return_metadata=MetadataQuery(score=True),
+            limit=1
+        )
+
+        if not response.objects:
+            raise ValueError(f"Issue with ID {issue_id} not found.")
+
+        issue = response.objects[0]
+
+        # Migrate the issue to the Solved collection
+        solved.data.insert(
+                properties=issue.properties,  # A dictionary with the properties of the object
+                uuid=issue.uuid,  # A UUID for the object
+                vector=issue.vector
+        )
+
+        # Optionally, remove the original issue if required
+        github_issues.data.delete_by_id(issue.uuid)
+    print(f"Issue with ID {issue_id} migrated successfully to Solved.")
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -113,6 +143,13 @@ async def websocket_endpoint(websocket: WebSocket, issue_id: str):
                     await websocket.send_text(f"suggested_reply:{result}")
                     await asyncio.sleep(0)
                 await websocket.send_text("suggested_reply:__message_finished__")
+            elif data == "resolve_issue":
+                try:
+                    # Migrate the specific issue to Solved
+                    migrate_issue_to_solved(issue_id)
+                    await websocket.send_text("Issue resolved and migrated to Solved.")
+                except ValueError as e:
+                    await websocket.send_text(f"Error: {str(e)}")
             else:
                 # Handle regular user input
                 async for result in get_results(data, conversation):
@@ -120,7 +157,6 @@ async def websocket_endpoint(websocket: WebSocket, issue_id: str):
                     await asyncio.sleep(0)
     finally:
         await websocket.close()
-
 
 
 @app.get("/chat-history/{chat_id}")

@@ -170,7 +170,7 @@ if __name__ == "__main__":
     # Connect to Weaviate
     with connect_to_weaviate() as client:  # Ensure the connection is closed properly
         # Perform near text search
-        collection = show_collection(client, "GithubIssues")
+        collection = show_collection(client, "Solved")
         collection_output = format_output(collection.objects)
 
         # Pretty print all properties only

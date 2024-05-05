@@ -21,6 +21,7 @@ client = weaviate.connect_to_wcs(
 def clear_data():
     """Clear data if a collection exists."""
     client.collections.delete("GithubIssues")
+    client.collections.delete("Solved")
 
 def create_collection():
     """Create the collection schema with all required properties, skipping vectorization as needed."""
@@ -46,6 +47,32 @@ def create_collection():
         ]
     )
     print(client.collections.exists("GithubIssues"))
+
+def create_solved_collection():
+    """Create the Solved collection schema with all required properties."""
+    client.collections.create(
+        name="Solved",
+        vectorizer_config=weaviate.classes.config.Configure.Vectorizer.text2vec_openai(model="text-embedding-3-small"),
+        properties=[
+            Property(name="issue_id", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="title", data_type=DataType.TEXT, vectorize_property_name=True, tokenization=Tokenization.LOWERCASE),
+            Property(name="body", data_type=DataType.TEXT, skip_vectorization=True, tokenization=Tokenization.WHITESPACE),
+            Property(name="urgency", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="type", data_type=DataType.TEXT),
+            Property(name="repo_name", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="state", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="created", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="updated", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="user_login", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="url", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="comments", data_type=DataType.NUMBER, skip_vectorization=True),
+            Property(name="user_type", data_type=DataType.TEXT, skip_vectorization=True),
+            Property(name="labels", data_type=DataType.TEXT_ARRAY, skip_vectorization=True),
+            Property(name="assignees", data_type=DataType.TEXT_ARRAY, skip_vectorization=True)
+        ]
+    )
+    print(client.collections.exists("Solved"))
+
 
 def generate_urgency(title, body):
     """Generate an urgency score using OpenAI GPT."""

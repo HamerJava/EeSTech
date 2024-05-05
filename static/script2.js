@@ -62,6 +62,12 @@ $(document).ready(function () {
         websocket.send("suggested_reply");
     });
 
+    // Handle "Resolved" button click
+    $("#resolved-btn").click(function () {
+        // Send a signal to resolve the issue
+        websocket.send("resolve_issue");
+    });
+
     // WebSocket message handling (responses from the server)
     websocket.onmessage = function (event) {
         if (event.data.startsWith("suggested_reply:")) {
@@ -76,6 +82,9 @@ $(document).ready(function () {
         } else if (event.data === "__message_finished__") {
             // Mark the end of a bot response
             message_finished = true;
+        } else if (event.data === "Issue resolved and migrated to Solved.") {
+            // Show an alert indicating the migration was successful
+            alert("The issue has been successfully migrated to the Solved database.");
         } else {
             // Append the bot response to the ongoing response ID
             const botMessageElement = $("#" + ongoingBotMessageId);
