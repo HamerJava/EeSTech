@@ -1,0 +1,19 @@
+<!-- issue_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Issue Details</title>
+</head>
+<body>
+    <h1>Issue Details</h1>
+    <div>
+        <h2>{{ issue['properties']['title'] }}</h2>
+        <ul>
+            {% for key, value in issue['properties'].items() %}
+            <li><strong>{{ key }}:</strong> {{ value }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
