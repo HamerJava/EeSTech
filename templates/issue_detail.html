@@ -1,19 +1,62 @@
-<!-- issue_detail.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Issue Details</title>
+    <title>Issue Details and Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .issue-container {
+            padding: 15px;
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+        }
+        #chat-container {
+            padding: 10px;
+            border-top: 2px solid #ccc;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Issue Details</h1>
-    <div>
-        <h2>{{ issue['properties']['title'] }}</h2>
-        <ul>
-            {% for key, value in issue['properties'].items() %}
-            <li><strong>{{ key }}:</strong> {{ value }}</li>
-            {% endfor %}
-        </ul>
+    <div class="issue-container" data-issue-id="{{ issue['issue_id'] }}">
+        <p><strong>Issue ID:</strong> {{ issue['issue_id'] }}</p>
+        <p><strong>Type:</strong> {{ issue['type'] }}</p>
+        <p><strong>URL:</strong> <a href="{{ issue['url'] }}" target="_blank">{{ issue['url'] }}</a></p>
+        <p><strong>Comments:</strong> {{ issue['comments'] }}</p>
+        <p><strong>User Type:</strong> {{ issue['user_type'] }}</p>
+        <p><strong>User Login:</strong> {{ issue['user_login'] }}</p>
+        <p><strong>Assignees:</strong> {{ issue['assignees'] }}</p>
+        <p><strong>Urgency:</strong> {{ issue['urgency'] }}</p>
+        <p><strong>Labels:</strong> {{ issue['labels'] }}</p>
+        <p><strong>Last Updated:</strong> {{ issue['updated'] }}</p>
+        <p><strong>Title:</strong> {{ issue['title'] }}</p>
+        <p><strong>State:</strong> {{ issue['state'] }}</p>
+        <p><strong>Repository Name:</strong> {{ issue['repo_name'] }}</p>
+        <p><strong>Body:</strong> {{ issue['body'] }}</p>
+        <p><strong>Created At:</strong> {{ issue['created'] }}</p>
     </div>
+
+    <div id="chat-container">
+        <form id="prompt-form">
+            <textarea id="prompt-input" placeholder="Type your message..."></textarea>
+            <button id="submit-btn">
+                <img id="submit-icon" src="/static/images/sendarrow_1.svg" alt="Send" />
+            </button>
+        </form>
+        <ul id="chat-history"></ul>
+    </div>
+    <div id="suggested-reply-container">
+        <button id="suggested-reply-btn">Suggested Reply</button>
+        <button id="copy-reply-btn">Copy</button>
+        <div id="suggested-reply-content"></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/static/script2.js"></script>
 </body>
 </html>

@@ -1,0 +1,246 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    overflow: auto;
+  }
+  
+  
+  h1,
+  h2 {
+    text-align: center;
+  }
+  
+  #sidebar-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 30%;
+    background-color: #ddd;
+    overflow-y: auto;
+  }
+  
+  /* Modified main-container styles */
+  #main-container {
+    margin-left: 30%;
+    position: relative;
+    width: 70%;
+    height: 100vh;
+    /* Add this line */
+  }
+  
+  
+  /* Modified chat-container styles */
+  #chat-container {
+    width: 100%;
+    height: 80%;
+    /* Reduce height to make room for prompt-form */
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  /* Modified prompt-form styles */
+  #prompt-form {
+    position: absolute;
+    bottom: 10%;
+    width: 50%;
+    min-width: 300px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    transition: all 0.5s ease-in-out;
+    z-index: 1;
+  }
+  
+  #prompt-input {
+    font-family: 'Arial', sans-serif;
+    padding: 10px;
+    padding-right: 30px;
+    /* increase this to move text away from button */
+    width: 100%;
+    border-radius: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    border: 0px solid #ccc;
+    font-size: 14px;
+    resize: none;
+    line-height: 20px;
+    /* adjust this to change line height */
+    height: 20px;
+    /* start with single line height */
+    max-height: 100px;
+    /* up to 5 lines */
+    overflow: auto;
+    /* if more than 5 lines, allow scroll */
+    outline: none;
+    /* remove default focus outline */
+  }
+  
+  #prompt-input::-webkit-scrollbar {
+    width: 7px;
+    /* width of the scrollbar */
+  }
+  
+  #prompt-input::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    /* color of the scrollbar thumb */
+    border-radius: 4px;
+    /* rounded corners */
+    height: 1px;
+    /* margin around the thumb */
+  }
+  
+  #prompt-input::-webkit-scrollbar-track {
+    background-color: transparent;
+    /* color of the scrollbar track */
+    margin: 19px;
+  }
+  
+  #submit-btn {
+    position: absolute;
+    right: 12px;
+    /* initial position */
+    bottom: 20px;
+    transform: translateY(50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    transition: all 0.3s ease;
+  }
+  
+  
+  #submit-btn:hover:after {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: -10px;
+    /* Moved 1 pixel to the left */
+    right: -8px;
+    bottom: -9px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  #submit-btn.no-hover:hover:after {
+    opacity: 0 !important;
+  }
+  
+  
+  
+  #submit-btn img {
+    width: 15px;
+    height: 15px;
+  }
+  
+  
+  .pulsating-circle {
+    position: absolute;
+    top: -9px;
+    left: -10px;
+    /* Moved 1 pixel to the left */
+    right: -8px;
+    bottom: -9px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    animation: pulsate 1s infinite;
+    z-index: -1;
+  }
+  
+  @keyframes pulsate {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  
+    10% {
+      transform: scale(1);
+      opacity: 1;
+    } 
+    40% {
+      transform: scale(1);
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      opacity: 0;
+  
+    }
+  
+    60% {
+      transform: scale(1);
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      opacity: 0;
+  
+    }
+  
+    90% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  
+  
+  #chat-container ul,
+  #chat-container ol {
+    padding: 0;
+    margin: 0;
+  }
+  
+  #chat-container::-webkit-scrollbar-track {
+    background: none;
+    /* No background */
+  }
+  
+  #chat-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  #chat-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  
+  
+  #chat-history {
+    list-style: none;
+    /* Entfernt die Aufzählungszeichen */
+    padding: 0;
+    margin: 0;
+  }
+  
+  
+  /* Message styles */
+  .user-response,
+  .bot-response {
+    color: black;
+    padding: 10px;
+    margin: 5px 0;
+    border-bottom: 1px solid #ccc;
+    /* horizontal separator line */
+    width: 70%;
+    /* Only occupies 60% of the container width */
+    margin-left: 15%;
+    /* Centers the message within the container */
+    text-align: left;
+    /* Text alignment */
+    word-wrap: break-word;
+    /* Wraps onto next line */
+  }
+  
+  .label {
+    font-weight: bold;
+  }

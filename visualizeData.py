@@ -113,10 +113,13 @@ def visualize_vectors(vectors):
     else:
         print("Not enough valid vectors to perform t-SNE.")
 
+# In visualizeData.py or wherever `prepare_graph_data` is implemented
+
 def prepare_graph_data(vectors):
-    """Prepare graph data using t-SNE and return reduced vectors as JSON for Plotly."""
+    """Prepare graph data using t-SNE and return reduced vectors as JSON."""
     cleaned_vectors = []
     titles = []
+    issue_ids = []  # Add a list to store issue IDs
     markers = []
     urgencies = []
     colors = {1: 'green', 2: 'yellow', 3: 'orange', 4: 'red'}
@@ -124,6 +127,7 @@ def prepare_graph_data(vectors):
     for vector_info in vectors:
         vector = vector_info["vector"]["default"]
         title = vector_info["properties"]["title"]
+        issue_id = vector_info["properties"]["issue_id"]  # Add issue_id to the data
         try:
             urgency = int(vector_info["properties"]["urgency"])
         except (ValueError, TypeError):
@@ -136,6 +140,7 @@ def prepare_graph_data(vectors):
             if np.isfinite(vector_np).all():
                 cleaned_vectors.append(vector_np)
                 titles.append(title)
+                issue_ids.append(issue_id)  # Append to the issue ID list
                 urgencies.append(colors[urgency])
                 markers.append("^" if pr_type == "pull request" else "o")
             else:
@@ -149,12 +154,16 @@ def prepare_graph_data(vectors):
         tsne = TSNE(n_components=2, perplexity=perplexity_value, learning_rate=100)
         vectors_reduced = tsne.fit_transform(vectors_np)
 
-        reduced_vectors = [{"title": titles[i], "x": float(x), "y": float(y), "marker": markers[i], "color": urgencies[i]} for i, (x, y) in enumerate(vectors_reduced)]
+        reduced_vectors = [
+            {"title": titles[i], "issue_id": issue_ids[i], "x": float(x), "y": float(y), "marker": markers[i], "color": urgencies[i]}
+            for i, (x, y) in enumerate(vectors_reduced)
+        ]
 
         return json.dumps(reduced_vectors, indent=4)
 
     else:
-        return json.dumps({"error": "Not enough valid vectors to perform t-SNE."})
+        return {"error": "Not enough valid vectors to perform t-SNE."}
+
 
 # Main execution
 if __name__ == "__main__":
